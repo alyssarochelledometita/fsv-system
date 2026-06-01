@@ -1,0 +1,960 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Georgia',serif;background:#0a0f1e;color:#c8d0e0;min-height:100vh}
+:root{
+  --navy:#0a0f1e;--navy2:#111827;--navy3:#1b2440;--navy4:#243058;
+  --silver:#b8c4d4;--silver2:#d4dce8;--silver3:#e8edf5;--silver4:#f0f4f8;
+  --gold:#c9a84c;--gold2:#dfc070;--gold3:#a07830;
+  --red:#c0392b;--green:#1a7a4a;
+}
+.view{display:none;min-height:600px}
+.view.active{display:block}
+
+/* ===== PUBLIC SITE ===== */
+#pub-nav{background:rgba(10,15,30,0.97);border-bottom:1px solid rgba(200,168,76,0.2);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.pub-logo{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:2px;color:var(--silver2)}
+.pub-logo span{color:var(--gold);font-weight:700}
+.pub-nav-links{display:flex;align-items:center;gap:24px}
+.pub-nav-links a{font-size:12px;letter-spacing:1.5px;color:var(--silver);cursor:pointer;text-decoration:none;transition:color .2s}
+.pub-nav-links a:hover{color:var(--gold)}
+.pub-nav-links .btn-inq{background:var(--gold);color:#0a0f1e;padding:8px 18px;border-radius:0;font-size:11px;letter-spacing:1.5px;font-weight:700;border:none;cursor:pointer}
+
+#pub-hero{background:#0a0f1e;min-height:480px;display:flex;align-items:center;justify-content:center;text-align:center;border-bottom:1px solid rgba(200,168,76,0.15);position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0f1e 0%,#111827 40%,#1b2440 100%);opacity:.95}
+.hero-content{position:relative;z-index:1}
+.hero-title{font-size:52px;font-weight:300;letter-spacing:6px;color:#fff;line-height:1.1}
+.hero-title span{color:var(--gold)}
+.hero-sub{font-size:12px;letter-spacing:4px;color:var(--gold);margin-top:16px;font-family:sans-serif}
+.hero-divider{width:1px;height:40px;background:var(--gold);margin:20px auto;opacity:.5}
+.hero-cta{background:var(--gold);color:#0a0f1e;border:none;padding:14px 36px;font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;font-family:sans-serif;margin-top:8px}
+
+#pub-spaces{background:#111827;padding:60px 40px;border-bottom:1px solid rgba(200,168,76,0.1)}
+.section-title{font-size:28px;font-weight:300;letter-spacing:2px;color:var(--silver3);margin-bottom:8px}
+.section-gold-line{width:48px;height:2px;background:var(--gold);margin-bottom:8px}
+.section-sub{font-size:12px;color:var(--silver);letter-spacing:1px;font-family:sans-serif;margin-bottom:36px}
+.spaces-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.space-card{background:#1b2440;border:1px solid rgba(200,168,76,0.2);padding:24px}
+.space-card-id{font-size:13px;letter-spacing:2px;color:var(--silver2);margin-bottom:4px;font-family:sans-serif}
+.space-card-rate{font-size:18px;color:var(--gold);font-family:sans-serif;font-weight:500;margin-bottom:8px}
+.space-card-rate span{font-size:11px;color:var(--silver);letter-spacing:1px}
+.space-card-desc{font-size:12px;color:var(--silver);line-height:1.6;font-family:sans-serif;margin-bottom:16px}
+.space-card-floor{display:inline-block;font-size:10px;letter-spacing:1.5px;color:var(--gold);border:1px solid rgba(200,168,76,0.4);padding:3px 10px;margin-bottom:16px;font-family:sans-serif}
+.space-card-btn{width:100%;background:transparent;border:1px solid var(--silver);color:var(--silver2);padding:10px;font-size:10px;letter-spacing:2px;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.space-card-btn:hover{background:var(--gold);color:#0a0f1e;border-color:var(--gold)}
+
+#pub-amenities{background:#0a0f1e;padding:60px 40px;border-bottom:1px solid rgba(200,168,76,0.1)}
+.amenities-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px}
+.amenity{text-align:center}
+.amenity-icon{font-size:28px;color:var(--gold);margin-bottom:12px}
+.amenity-title{font-size:11px;letter-spacing:2px;color:var(--silver3);margin-bottom:8px;font-family:sans-serif;font-weight:700}
+.amenity-desc{font-size:12px;color:var(--silver);line-height:1.6;font-family:sans-serif}
+
+#pub-footer{background:#070c18;padding:28px 40px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(200,168,76,0.15)}
+.footer-logo{font-size:11px;letter-spacing:3px;color:var(--silver)}
+.footer-tagline{font-size:10px;letter-spacing:2px;color:var(--gold);font-family:sans-serif}
+.footer-admin-link{font-size:10px;color:rgba(255,255,255,0.2);cursor:pointer;letter-spacing:1px;font-family:sans-serif;transition:color .2s}
+.footer-admin-link:hover{color:var(--gold)}
+
+/* ===== INQUIRY MODAL ===== */
+#inq-modal{display:none;background:rgba(5,8,20,0.92);position:fixed;inset:0;z-index:9000;align-items:center;justify-content:center}
+#inq-modal.open{display:flex}
+.inq-box{background:#111827;border:1px solid rgba(200,168,76,0.3);width:480px;max-width:95vw}
+.inq-header{padding:24px 28px 16px;border-bottom:1px solid rgba(200,168,76,0.15);display:flex;justify-content:space-between;align-items:flex-start}
+.inq-header h3{font-size:20px;font-weight:300;letter-spacing:2px;color:var(--silver3)}
+.inq-header p{font-size:11px;color:var(--gold);letter-spacing:1px;margin-top:4px;font-family:sans-serif}
+.inq-close{background:none;border:none;color:var(--silver);font-size:22px;cursor:pointer;line-height:1}
+.inq-body{padding:24px 28px}
+.inq-field{margin-bottom:16px}
+.inq-label{display:block;font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;font-family:sans-serif}
+.inq-input{width:100%;background:#1b2440;border:1px solid rgba(200,168,76,0.2);color:var(--silver2);padding:10px 14px;font-size:13px;outline:none;font-family:sans-serif}
+.inq-input:focus{border-color:var(--gold)}
+.inq-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inq-submit{width:100%;background:var(--gold);color:#0a0f1e;border:none;padding:14px;font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;font-family:sans-serif;margin-top:8px}
+.inq-success{text-align:center;padding:32px;display:none}
+.inq-success-icon{font-size:36px;color:var(--gold);margin-bottom:12px}
+.inq-success h4{font-size:16px;color:var(--silver3);letter-spacing:1px;margin-bottom:8px}
+.inq-success p{font-size:12px;color:var(--silver);font-family:sans-serif;line-height:1.6}
+
+/* ===== LOGIN PAGE ===== */
+#login-page{background:#0a0f1e;min-height:600px;display:flex;align-items:center;justify-content:center}
+.login-box{background:#111827;border:1px solid rgba(200,168,76,0.25);width:380px;padding:0}
+.login-header{background:#070c18;padding:28px;text-align:center;border-bottom:1px solid rgba(200,168,76,0.15)}
+.login-logo{font-size:11px;letter-spacing:3px;color:var(--silver);margin-bottom:4px}
+.login-logo span{color:var(--gold)}
+.login-sub{font-size:10px;letter-spacing:2px;color:var(--gold);font-family:sans-serif}
+.login-body{padding:28px}
+.login-field{margin-bottom:16px}
+.login-label{display:block;font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;font-family:sans-serif}
+.login-input{width:100%;background:#1b2440;border:1px solid rgba(200,168,76,0.2);color:var(--silver2);padding:10px 14px;font-size:13px;outline:none;font-family:sans-serif}
+.login-input:focus{border-color:var(--gold)}
+.login-btn{width:100%;background:var(--gold);color:#0a0f1e;border:none;padding:13px;font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;font-family:sans-serif;margin-top:8px}
+.login-err{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.4);color:#e57373;padding:10px 14px;font-size:12px;font-family:sans-serif;margin-bottom:14px;display:none}
+.login-back{display:block;text-align:center;margin-top:16px;font-size:11px;color:var(--silver);font-family:sans-serif;cursor:pointer;letter-spacing:1px}
+.login-back:hover{color:var(--gold)}
+.login-hint{margin-top:20px;padding:12px;background:rgba(200,168,76,0.06);border:1px solid rgba(200,168,76,0.15);font-size:11px;color:var(--silver);font-family:sans-serif;line-height:1.7;border-radius:0}
+
+/* ===== ADMIN PORTAL ===== */
+#admin-page{background:#0d1117;min-height:600px;display:flex;flex-direction:column}
+.admin-nav{background:#070c18;border-bottom:1px solid rgba(200,168,76,0.2);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.admin-logo{display:flex;align-items:center;gap:10px}
+.admin-logo-badge{width:28px;height:28px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0a0f1e}
+.admin-logo-text{font-size:12px;letter-spacing:2px;color:var(--silver2)}
+.admin-logo-sub{font-size:9px;letter-spacing:1.5px;color:var(--gold);font-family:sans-serif}
+.admin-nav-links{display:flex;align-items:center;gap:4px}
+.anl{padding:6px 12px;font-size:11px;letter-spacing:1px;color:var(--silver);cursor:pointer;font-family:sans-serif;transition:color .15s;border-bottom:2px solid transparent}
+.anl:hover{color:var(--silver3)}
+.anl.active{color:var(--gold);border-bottom-color:var(--gold)}
+.anl-danger{color:rgba(192,57,43,0.8)!important}
+.anl-danger:hover{color:#e57373!important}
+.pub-link{font-size:10px;letter-spacing:1px;color:rgba(200,168,76,0.5);cursor:pointer;font-family:sans-serif;padding:4px 8px;border:1px solid rgba(200,168,76,0.2)}
+.pub-link:hover{color:var(--gold)}
+
+.admin-body{display:flex;flex:1}
+.admin-content{flex:1;padding:24px;overflow-x:auto}
+.a-page{display:none}
+.a-page.active{display:block}
+
+.a-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.a-stat{background:#111827;border:1px solid rgba(200,168,76,0.1);padding:16px}
+.a-stat-label{font-size:10px;letter-spacing:1.5px;color:var(--silver);font-family:sans-serif;margin-bottom:8px}
+.a-stat-val{font-size:24px;color:var(--silver3);font-weight:300}
+.a-stat-val.gold{color:var(--gold)}
+.a-stat-sub{font-size:10px;color:rgba(200,168,76,0.5);font-family:sans-serif;margin-top:4px}
+
+.a-card{background:#111827;border:1px solid rgba(200,168,76,0.12);margin-bottom:16px}
+.a-card-header{padding:12px 16px;border-bottom:1px solid rgba(200,168,76,0.1);display:flex;align-items:center;justify-content:space-between}
+.a-card-title{font-size:11px;letter-spacing:2px;color:var(--silver2);font-family:sans-serif}
+.a-table-wrap{overflow-x:auto}
+.a-table{width:100%;border-collapse:collapse;font-family:sans-serif}
+.a-table th{padding:8px 12px;font-size:10px;letter-spacing:1.5px;color:var(--gold);border-bottom:1px solid rgba(200,168,76,0.15);text-align:left;white-space:nowrap}
+.a-table td{padding:9px 12px;font-size:12px;color:var(--silver);border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+.a-table tr:hover td{background:rgba(200,168,76,0.03)}
+.a-badge{display:inline-block;padding:2px 8px;font-size:10px;letter-spacing:1px;font-family:sans-serif}
+.a-badge-gold{background:rgba(200,168,76,0.15);color:var(--gold)}
+.a-badge-blue{background:rgba(30,60,120,0.4);color:#80a8e8}
+.a-badge-red{background:rgba(192,57,43,0.2);color:#e88080}
+.a-badge-green{background:rgba(26,122,74,0.2);color:#6ec898}
+.a-badge-gray{background:rgba(255,255,255,0.06);color:var(--silver)}
+
+.a-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:10px;letter-spacing:1.5px;cursor:pointer;font-family:sans-serif;border:none;transition:all .15s}
+.a-btn-gold{background:var(--gold);color:#0a0f1e;font-weight:700}
+.a-btn-gold:hover{background:var(--gold2)}
+.a-btn-outline{background:transparent;border:1px solid rgba(200,168,76,0.3);color:var(--silver)}
+.a-btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.a-btn-red{background:transparent;border:1px solid rgba(192,57,43,0.4);color:#e88080}
+.a-btn-red:hover{background:rgba(192,57,43,0.15)}
+.a-btn-sm{padding:4px 8px;font-size:10px}
+
+.a-filters{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.a-search{background:#1b2440;border:1px solid rgba(200,168,76,0.15);color:var(--silver2);padding:7px 12px;font-size:12px;font-family:sans-serif;outline:none;min-width:200px}
+.a-search:focus{border-color:var(--gold)}
+.a-select{background:#1b2440;border:1px solid rgba(200,168,76,0.15);color:var(--silver2);padding:7px 12px;font-size:11px;font-family:sans-serif;outline:none;cursor:pointer}
+.a-select:focus{border-color:var(--gold)}
+
+.a-modal-overlay{display:none;background:rgba(5,8,20,0.88);position:fixed;inset:0;z-index:8000;align-items:center;justify-content:center}
+.a-modal-overlay.open{display:flex}
+.a-modal{background:#111827;border:1px solid rgba(200,168,76,0.25);width:500px;max-width:95vw;max-height:85vh;overflow-y:auto}
+.a-modal-header{padding:16px 20px;border-bottom:1px solid rgba(200,168,76,0.12);display:flex;justify-content:space-between;align-items:center}
+.a-modal-title{font-size:12px;letter-spacing:2px;color:var(--silver3)}
+.a-modal-close{background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer}
+.a-modal-body{padding:20px}
+.a-modal-footer{padding:12px 20px;border-top:1px solid rgba(200,168,76,0.1);display:flex;justify-content:flex-end;gap:8px}
+.a-form-group{margin-bottom:14px}
+.a-form-label{display:block;font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:5px;font-family:sans-serif}
+.a-form-ctrl{width:100%;background:#1b2440;border:1px solid rgba(200,168,76,0.2);color:var(--silver2);padding:9px 12px;font-size:13px;outline:none;font-family:sans-serif}
+.a-form-ctrl:focus{border-color:var(--gold)}
+.a-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.a-progress{height:4px;background:rgba(255,255,255,0.08);width:100%;margin-top:4px}
+.a-progress-fill{height:100%;background:var(--gold)}
+
+.a-alert{padding:10px 14px;font-size:12px;font-family:sans-serif;margin-bottom:12px;border:1px solid}
+.a-alert-warn{background:rgba(200,168,76,0.08);border-color:rgba(200,168,76,0.3);color:var(--gold2)}
+.a-alert-info{background:rgba(30,60,120,0.2);border-color:rgba(80,120,200,0.3);color:#80a8e8}
+
+.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.report-tile{background:#111827;border:1px solid rgba(200,168,76,0.12);padding:18px;cursor:pointer;text-align:center;transition:border-color .2s}
+.report-tile:hover{border-color:var(--gold)}
+.report-tile-icon{font-size:24px;color:var(--gold);margin-bottom:8px}
+.report-tile-name{font-size:10px;letter-spacing:1.5px;color:var(--silver2);font-family:sans-serif}
+.report-tile-desc{font-size:10px;color:var(--silver);font-family:sans-serif;margin-top:4px}
+
+#report-out{display:none}
+</style>
+
+<div id="pub-view" class="view active">
+  <div id="pub-nav">
+    <div class="pub-logo">F &amp; <span>S</span> VELASCO</div>
+    <div class="pub-nav-links">
+      <a onclick="scrollToId('pub-spaces')">Spaces</a>
+      <a onclick="scrollToId('pub-amenities')">Amenities</a>
+      <button class="btn-inq" onclick="openInq(null)">INQUIRE NOW</button>
+    </div>
+  </div>
+
+  <div id="pub-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-title">F &amp; S VELASCO</div>
+      <div class="hero-sub">SPACE FOR GROWTH</div>
+      <div class="hero-divider"></div>
+      <button class="hero-cta" onclick="scrollToId('pub-spaces')">VIEW AVAILABLE SPACES</button>
+    </div>
+  </div>
+
+  <div id="pub-spaces">
+    <div class="section-gold-line"></div>
+    <div class="section-title">Leasing Directory</div>
+    <div class="section-sub">Refined units tailored for high-end retail and modern enterprise.</div>
+    <div class="spaces-grid" id="pub-spaces-grid"></div>
+    <div id="pub-no-spaces" style="display:none;text-align:center;padding:40px;color:var(--silver);font-family:sans-serif;font-size:13px">No available spaces at this time. Please check back soon.</div>
+  </div>
+
+  <div id="pub-amenities">
+    <div class="section-gold-line"></div>
+    <div class="section-title">Building Amenities</div>
+    <div class="amenities-grid">
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-shield-check"></i></div>
+        <div class="amenity-title">24/7 SECURITY</div>
+        <div class="amenity-desc">Integrated surveillance and professional on-site monitoring for absolute peace of mind.</div>
+      </div>
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-bolt"></i></div>
+        <div class="amenity-title">HIGH-SPEED FIBER</div>
+        <div class="amenity-desc">Dedicated enterprise-grade connectivity ensuring seamless digital operations.</div>
+      </div>
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-wind"></i></div>
+        <div class="amenity-title">MODERN VENTILATION</div>
+        <div class="amenity-desc">Advanced climate control systems designed for sustainable comfort and air purity.</div>
+      </div>
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-car"></i></div>
+        <div class="amenity-title">AMPLE PARKING</div>
+        <div class="amenity-desc">Dedicated parking for tenants and visitors with 24-hour access.</div>
+      </div>
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-building"></i></div>
+        <div class="amenity-title">PRIME LOCATION</div>
+        <div class="amenity-desc">Strategically located for maximum visibility and customer foot traffic.</div>
+      </div>
+      <div class="amenity">
+        <div class="amenity-icon"><i class="ti ti-tool"></i></div>
+        <div class="amenity-title">MAINTENANCE SUPPORT</div>
+        <div class="amenity-desc">On-call building maintenance team available to all tenants at all times.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pub-footer">
+    <div>
+      <div class="footer-logo">F &amp; S VELASCO COMMERCIAL BUILDING</div>
+      <div class="footer-tagline">ARCHITECTING COMMERCIAL EXCELLENCE</div>
+    </div>
+    <div class="footer-admin-link" onclick="goLogin()">Staff Portal</div>
+  </div>
+</div>
+
+<div id="login-view" class="view">
+  <div id="login-page">
+    <div class="login-box">
+      <div class="login-header">
+        <div class="login-logo">F &amp; <span>S</span> VELASCO</div>
+        <div class="login-sub">ADMIN PORTAL — STAFF ACCESS ONLY</div>
+      </div>
+      <div class="login-body">
+        <div class="login-err" id="login-err">Invalid credentials. Access denied.</div>
+        <div class="login-field">
+          <label class="login-label">USERNAME</label>
+          <input class="login-input" id="login-user" placeholder="Bookkeeper username" type="text">
+        </div>
+        <div class="login-field">
+          <label class="login-label">PASSWORD</label>
+          <input class="login-input" id="login-pass" placeholder="Password" type="password" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="login-btn" onclick="doLogin()">ACCESS ADMIN PORTAL</button>
+        <span class="login-back" onclick="goPublic()">← Return to public site</span>
+        <div class="login-hint">
+          Demo credentials:<br>
+          <strong style="color:var(--gold)">rosa</strong> / <strong style="color:var(--gold)">bk2024</strong> (Bookkeeper)<br>
+          <strong style="color:var(--gold)">carlo</strong> / <strong style="color:var(--gold)">bk2024</strong> (Bookkeeper)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="admin-view" class="view">
+  <div id="admin-page">
+    <div class="admin-nav">
+      <div class="admin-logo">
+        <div class="admin-logo-badge">V</div>
+        <div>
+          <div class="admin-logo-text">F &amp; S VELASCO</div>
+          <div class="admin-logo-sub">ADMIN PORTAL</div>
+        </div>
+      </div>
+      <div class="admin-nav-links">
+        <span class="anl active" onclick="aPage('dash')">Dashboard</span>
+        <span class="anl" onclick="aPage('inquiries')">Inquiries</span>
+        <span class="anl" onclick="aPage('spaces')">Spaces</span>
+        <span class="anl" onclick="aPage('tenants')">Tenants</span>
+        <span class="anl" onclick="aPage('contracts')">Contracts</span>
+        <span class="anl" onclick="aPage('finance')">Finance</span>
+        <span class="anl" onclick="aPage('staff')">Staff</span>
+        <span class="anl" onclick="aPage('reports')">Reports</span>
+        <span style="width:1px;height:24px;background:rgba(200,168,76,0.15);margin:0 8px"></span>
+        <span class="anl anl-danger" onclick="doLogout()">Logout</span>
+        <span class="pub-link" onclick="goPublic()">Public Site</span>
+      </div>
+    </div>
+
+    <div class="admin-body">
+      <div class="admin-content">
+
+        <div class="a-page active" id="ap-dash">
+          <div class="a-stat-grid">
+            <div class="a-stat"><div class="a-stat-label">INQUIRY PIPELINE</div><div class="a-stat-val gold" id="ds-inq">0</div><div class="a-stat-sub">Awaiting follow-up</div></div>
+            <div class="a-stat"><div class="a-stat-label">ACTIVE TENANTS</div><div class="a-stat-val" id="ds-ten">0</div><div class="a-stat-sub">Currently contracted</div></div>
+            <div class="a-stat"><div class="a-stat-label">AVAILABLE UNITS</div><div class="a-stat-val" id="ds-avail">0</div><div class="a-stat-sub">Ready to lease</div></div>
+            <div class="a-stat"><div class="a-stat-label">MONTHLY REVENUE</div><div class="a-stat-val gold" id="ds-rev">₱0</div><div class="a-stat-sub">Collected this month</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="a-card">
+              <div class="a-card-header"><span class="a-card-title">BUILDING OCCUPANCY</span></div>
+              <div style="padding:16px">
+                <div id="ds-occ-bars"></div>
+              </div>
+            </div>
+            <div class="a-card">
+              <div class="a-card-header"><span class="a-card-title">RECENT INQUIRIES</span><button class="a-btn a-btn-gold a-btn-sm" onclick="aPage('inquiries')">VIEW ALL</button></div>
+              <div class="a-table-wrap">
+                <table class="a-table"><thead><tr><th>NAME</th><th>SPACE</th><th>DATE</th><th>STATUS</th></tr></thead>
+                <tbody id="ds-recent-inq"></tbody></table>
+              </div>
+            </div>
+          </div>
+          <div class="a-card" style="margin-top:16px">
+            <div class="a-card-header"><span class="a-card-title">CONTRACTS EXPIRING SOON</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table"><thead><tr><th>TENANT</th><th>SPACE</th><th>END DATE</th><th>DAYS LEFT</th></tr></thead>
+              <tbody id="ds-exp-con"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-inquiries">
+          <div class="a-filters">
+            <input class="a-search" placeholder="Search inquiries..." id="iq-search" oninput="renderIQ()">
+            <select class="a-select" id="iq-filter" onchange="renderIQ()">
+              <option value="">All Status</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Converted">Converted</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div class="a-card">
+            <div class="a-card-header"><span class="a-card-title">INQUIRY PIPELINE</span><span class="a-badge a-badge-gold" id="iq-count">0</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table">
+                <thead><tr><th>ID</th><th>NAME</th><th>CONTACT</th><th>SPACE INTEREST</th><th>DATE</th><th>STATUS</th><th>BOOKKEEPER</th><th>ACTIONS</th></tr></thead>
+                <tbody id="iq-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-spaces">
+          <div class="a-filters">
+            <button class="a-btn a-btn-gold" onclick="openAModal('am-add-space')"><i class="ti ti-plus"></i> ADD SPACE</button>
+            <select class="a-select" id="sp-filter" onchange="renderSP()">
+              <option value="">All Status</option>
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Under Maintenance">Under Maintenance</option>
+            </select>
+            <select class="a-select" id="sp-floor-f" onchange="renderSP()">
+              <option value="">All Floors</option>
+              <option value="1st Floor">1st Floor</option>
+              <option value="2nd Floor">2nd Floor</option>
+              <option value="3rd Floor">3rd Floor</option>
+            </select>
+          </div>
+          <div class="a-card">
+            <div class="a-card-header"><span class="a-card-title">SPACE INVENTORY</span><span class="a-badge a-badge-gold" id="sp-count">0</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table">
+                <thead><tr><th>ID</th><th>UNIT NO.</th><th>FLOOR</th><th>STATUS</th><th>MONTHLY RATE</th><th>TENANT</th><th>ACTIONS</th></tr></thead>
+                <tbody id="sp-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-tenants">
+          <div class="a-filters">
+            <button class="a-btn a-btn-gold" onclick="openAModal('am-add-tenant')"><i class="ti ti-plus"></i> ADD TENANT</button>
+            <input class="a-search" placeholder="Search tenants..." id="tn-search" oninput="renderTN()">
+          </div>
+          <div class="a-card">
+            <div class="a-card-header"><span class="a-card-title">TENANT REGISTRY</span><span class="a-badge a-badge-gold" id="tn-count">0</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table">
+                <thead><tr><th>ID</th><th>TENANT</th><th>BUSINESS</th><th>CONTACT</th><th>SPACE</th><th>MOVE-IN</th><th>BOOKKEEPER</th><th>ACTIONS</th></tr></thead>
+                <tbody id="tn-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-contracts">
+          <div class="a-filters">
+            <button class="a-btn a-btn-gold" onclick="openAModal('am-add-contract')"><i class="ti ti-plus"></i> NEW CONTRACT</button>
+            <select class="a-select" id="con-filter" onchange="renderCON()">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="expiring">Expiring Soon</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+          <div class="a-card">
+            <div class="a-card-header"><span class="a-card-title">RENTAL CONTRACTS</span><span class="a-badge a-badge-gold" id="con-count">0</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table">
+                <thead><tr><th>ID</th><th>TENANT</th><th>SPACE</th><th>START</th><th>END</th><th>EXT.</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+                <tbody id="con-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-finance">
+          <div class="a-filters">
+            <button class="a-btn a-btn-gold" onclick="openAModal('am-add-payment')"><i class="ti ti-plus"></i> RECORD PAYMENT</button>
+            <select class="a-select" id="pay-filter" onchange="renderPAY()">
+              <option value="">All</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <div class="a-stat-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="a-stat"><div class="a-stat-label">TOTAL COLLECTED</div><div class="a-stat-val gold" id="fin-total">₱0</div></div>
+            <div class="a-stat"><div class="a-stat-label">OUTSTANDING</div><div class="a-stat-val" style="color:#e88080" id="fin-pend">₱0</div></div>
+            <div class="a-stat"><div class="a-stat-label">THIS MONTH</div><div class="a-stat-val gold" id="fin-month">₱0</div></div>
+          </div>
+          <div class="a-card">
+            <div class="a-card-header"><span class="a-card-title">PAYMENT RECORDS</span><span class="a-badge a-badge-gold" id="pay-count">0</span></div>
+            <div class="a-table-wrap">
+              <table class="a-table">
+                <thead><tr><th>ID</th><th>DATE</th><th>TENANT</th><th>AMOUNT</th><th>METHOD</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+                <tbody id="pay-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-staff">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="a-card">
+              <div class="a-card-header"><span class="a-card-title">BOOKKEEPERS</span><button class="a-btn a-btn-gold a-btn-sm" onclick="openAModal('am-add-bk')">+ ADD</button></div>
+              <div class="a-table-wrap">
+                <table class="a-table"><thead><tr><th>ID</th><th>NAME</th><th>EMAIL</th><th>ASSIGNED</th></tr></thead>
+                <tbody id="bk-table"></tbody></table>
+              </div>
+            </div>
+            <div class="a-card">
+              <div class="a-card-header"><span class="a-card-title">ATTORNEYS</span><button class="a-btn a-btn-gold a-btn-sm" onclick="openAModal('am-add-att')">+ ADD</button></div>
+              <div class="a-table-wrap">
+                <table class="a-table"><thead><tr><th>ID</th><th>NAME</th><th>CONTACT</th><th>BOOKKEEPER</th></tr></thead>
+                <tbody id="att-table"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-page" id="ap-reports">
+          <div class="report-grid">
+            <div class="report-tile" onclick="genReport('tenant-masterlist')"><div class="report-tile-icon"><i class="ti ti-users"></i></div><div class="report-tile-name">TENANT MASTERLIST</div><div class="report-tile-desc">All tenants with full profile</div></div>
+            <div class="report-tile" onclick="genReport('space-availability')"><div class="report-tile-icon"><i class="ti ti-building"></i></div><div class="report-tile-name">SPACE AVAILABILITY</div><div class="report-tile-desc">Inventory by status and floor</div></div>
+            <div class="report-tile" onclick="genReport('active-contracts')"><div class="report-tile-icon"><i class="ti ti-file-text"></i></div><div class="report-tile-name">ACTIVE CONTRACTS</div><div class="report-tile-desc">Currently running leases</div></div>
+            <div class="report-tile" onclick="genReport('expiring-contracts')"><div class="report-tile-icon"><i class="ti ti-clock"></i></div><div class="report-tile-name">EXPIRING CONTRACTS</div><div class="report-tile-desc">Contracts due within 30 days</div></div>
+            <div class="report-tile" onclick="genReport('monthly-collection')"><div class="report-tile-icon"><i class="ti ti-chart-line"></i></div><div class="report-tile-name">MONTHLY COLLECTION</div><div class="report-tile-desc">Revenue by month</div></div>
+            <div class="report-tile" onclick="genReport('overdue-payments')"><div class="report-tile-icon"><i class="ti ti-alert-triangle"></i></div><div class="report-tile-name">OVERDUE PAYMENTS</div><div class="report-tile-desc">Pending and unpaid balances</div></div>
+            <div class="report-tile" onclick="genReport('inquiry-volume')"><div class="report-tile-icon"><i class="ti ti-message-dots"></i></div><div class="report-tile-name">INQUIRY VOLUME</div><div class="report-tile-desc">Inquiries per space</div></div>
+            <div class="report-tile" onclick="genReport('bookkeeper-performance')"><div class="report-tile-icon"><i class="ti ti-briefcase"></i></div><div class="report-tile-name">BOOKKEEPER PERFORMANCE</div><div class="report-tile-desc">Workload per staff</div></div>
+            <div class="report-tile" onclick="genReport('revenue-summary')"><div class="report-tile-icon"><i class="ti ti-coins"></i></div><div class="report-tile-name">REVENUE SUMMARY</div><div class="report-tile-desc">Annual revenue breakdown</div></div>
+            <div class="report-tile" onclick="genReport('contract-history')"><div class="report-tile-icon"><i class="ti ti-history"></i></div><div class="report-tile-name">CONTRACT HISTORY</div><div class="report-tile-desc">Full lease history per tenant</div></div>
+            <div class="report-tile" onclick="genReport('space-utilization')"><div class="report-tile-icon"><i class="ti ti-chart-pie"></i></div><div class="report-tile-name">SPACE UTILIZATION</div><div class="report-tile-desc">Occupancy rate by floor</div></div>
+            <div class="report-tile" onclick="genReport('attorney-bookkeeper')"><div class="report-tile-icon"><i class="ti ti-scale"></i></div><div class="report-tile-name">ATTORNEY–BOOKKEEPER</div><div class="report-tile-desc">Assignment overview</div></div>
+          </div>
+          <div id="report-out" class="a-card">
+            <div class="a-card-header" id="report-out-title"></div>
+            <div class="a-table-wrap" id="report-out-body"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INQUIRY MODAL (PUBLIC) -->
+<div id="inq-modal">
+  <div class="inq-box">
+    <div class="inq-header">
+      <div><h3>INQUIRE NOW</h3><p>F &amp; S VELASCO COMMERCIAL BUILDING</p></div>
+      <button class="inq-close" onclick="closeInq()">×</button>
+    </div>
+    <div class="inq-body" id="inq-form-body">
+      <div class="inq-row">
+        <div class="inq-field"><label class="inq-label">FIRST NAME</label><input class="inq-input" id="iq-fname" placeholder="First name"></div>
+        <div class="inq-field"><label class="inq-label">LAST NAME</label><input class="inq-input" id="iq-lname" placeholder="Last name"></div>
+      </div>
+      <div class="inq-field"><label class="inq-label">EMAIL ADDRESS</label><input class="inq-input" id="iq-email" placeholder="your@email.com" type="email"></div>
+      <div class="inq-field"><label class="inq-label">CONTACT NUMBER</label><input class="inq-input" id="iq-contact" placeholder="09XXXXXXXXX"></div>
+      <div class="inq-field"><label class="inq-label">SPACE OF INTEREST</label>
+        <select class="inq-input" id="iq-space">
+          <option value="">— Select a unit —</option>
+        </select>
+      </div>
+      <div class="inq-field"><label class="inq-label">MESSAGE (OPTIONAL)</label><textarea class="inq-input" id="iq-msg" rows="3" placeholder="Tell us about your business..."></textarea></div>
+      <button class="inq-submit" onclick="submitInquiry()">SUBMIT INQUIRY</button>
+    </div>
+    <div class="inq-success" id="inq-success-body">
+      <div class="inq-success-icon"><i class="ti ti-check"></i></div>
+      <h4>INQUIRY RECEIVED</h4>
+      <p>Thank you for your interest in F &amp; S Velasco. Our team will contact you within 1–2 business days to discuss your requirements.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODALS -->
+<div class="a-modal-overlay" id="am-add-space">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">ADD NEW SPACE</span><button class="a-modal-close" onclick="closeAModal('am-add-space')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">UNIT NUMBER</label><input class="a-form-ctrl" id="sp-num" placeholder="e.g. 101"></div><div class="a-form-group"><label class="a-form-label">FLOOR</label><select class="a-form-ctrl" id="sp-floor"><option>1st Floor</option><option>2nd Floor</option><option>3rd Floor</option></select></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">MONTHLY RATE (₱)</label><input class="a-form-ctrl" id="sp-rate" type="number" placeholder="15000"></div><div class="a-form-group"><label class="a-form-label">STATUS</label><select class="a-form-ctrl" id="sp-status"><option>Available</option><option>Occupied</option><option>Under Maintenance</option></select></div></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-space')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addSpace()">ADD SPACE</button></div>
+  </div>
+</div>
+
+<div class="a-modal-overlay" id="am-add-tenant">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">REGISTER TENANT</span><button class="a-modal-close" onclick="closeAModal('am-add-tenant')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">FIRST NAME</label><input class="a-form-ctrl" id="tn-fname" placeholder="First name"></div><div class="a-form-group"><label class="a-form-label">LAST NAME</label><input class="a-form-ctrl" id="tn-lname" placeholder="Last name"></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">EMAIL</label><input class="a-form-ctrl" id="tn-email" type="email" placeholder="email@business.com"></div><div class="a-form-group"><label class="a-form-label">CONTACT</label><input class="a-form-ctrl" id="tn-contact" placeholder="09XXXXXXXXX"></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">BUSINESS NAME</label><input class="a-form-ctrl" id="tn-bizname" placeholder="Business name"></div><div class="a-form-group"><label class="a-form-label">BUSINESS TYPE</label><input class="a-form-ctrl" id="tn-biztype" placeholder="e.g. Retail"></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">MOVE-IN DATE</label><input class="a-form-ctrl" id="tn-movein" type="date"></div><div class="a-form-group"><label class="a-form-label">BOOKKEEPER</label><select class="a-form-ctrl" id="tn-bk"></select></div></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-tenant')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addTenant()">REGISTER</button></div>
+  </div>
+</div>
+
+<div class="a-modal-overlay" id="am-add-contract">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">CREATE CONTRACT</span><button class="a-modal-close" onclick="closeAModal('am-add-contract')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-group"><label class="a-form-label">TENANT</label><select class="a-form-ctrl" id="con-tenant"></select></div>
+      <div class="a-form-group"><label class="a-form-label">SPACE</label><select class="a-form-ctrl" id="con-space"></select></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">START DATE</label><input class="a-form-ctrl" id="con-start" type="date"></div><div class="a-form-group"><label class="a-form-label">END DATE</label><input class="a-form-ctrl" id="con-end" type="date"></div></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-contract')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addContract()">CREATE</button></div>
+  </div>
+</div>
+
+<div class="a-modal-overlay" id="am-add-payment">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">RECORD PAYMENT</span><button class="a-modal-close" onclick="closeAModal('am-add-payment')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-group"><label class="a-form-label">CONTRACT</label><select class="a-form-ctrl" id="pay-con"></select></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">AMOUNT (₱)</label><input class="a-form-ctrl" id="pay-amt" type="number" placeholder="15000"></div><div class="a-form-group"><label class="a-form-label">DATE</label><input class="a-form-ctrl" id="pay-date" type="date"></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">METHOD</label><select class="a-form-ctrl" id="pay-meth"><option>Bank Transfer</option><option>Cash</option><option>GCash</option><option>Check</option></select></div><div class="a-form-group"><label class="a-form-label">STATUS</label><select class="a-form-ctrl" id="pay-stat"><option>Paid</option><option>Pending</option></select></div></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-payment')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addPayment()">RECORD</button></div>
+  </div>
+</div>
+
+<div class="a-modal-overlay" id="am-add-bk">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">ADD BOOKKEEPER</span><button class="a-modal-close" onclick="closeAModal('am-add-bk')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-group"><label class="a-form-label">FULL NAME</label><input class="a-form-ctrl" id="bk-name" placeholder="Full name"></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">USERNAME</label><input class="a-form-ctrl" id="bk-user" placeholder="Login username"></div><div class="a-form-group"><label class="a-form-label">PASSWORD</label><input class="a-form-ctrl" id="bk-pass" type="password" placeholder="Password"></div></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">EMAIL</label><input class="a-form-ctrl" id="bk-email" type="email"></div><div class="a-form-group"><label class="a-form-label">CONTACT</label><input class="a-form-ctrl" id="bk-contact" placeholder="09XXXXXXXXX"></div></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-bk')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addBK()">ADD</button></div>
+  </div>
+</div>
+
+<div class="a-modal-overlay" id="am-add-att">
+  <div class="a-modal">
+    <div class="a-modal-header"><span class="a-modal-title">ADD ATTORNEY</span><button class="a-modal-close" onclick="closeAModal('am-add-att')">×</button></div>
+    <div class="a-modal-body">
+      <div class="a-form-group"><label class="a-form-label">FULL NAME</label><input class="a-form-ctrl" id="att-name" placeholder="Full name"></div>
+      <div class="a-form-row"><div class="a-form-group"><label class="a-form-label">EMAIL</label><input class="a-form-ctrl" id="att-email" type="email"></div><div class="a-form-group"><label class="a-form-label">CONTACT</label><input class="a-form-ctrl" id="att-contact" placeholder="09XXXXXXXXX"></div></div>
+      <div class="a-form-group"><label class="a-form-label">ASSIGNED BOOKKEEPER</label><select class="a-form-ctrl" id="att-bk"></select></div>
+    </div>
+    <div class="a-modal-footer"><button class="a-btn a-btn-outline" onclick="closeAModal('am-add-att')">CANCEL</button><button class="a-btn a-btn-gold" onclick="addAtt()">ADD</button></div>
+  </div>
+</div>
+
+<script>
+const TODAY = new Date().toISOString().split('T')[0];
+
+const DB = {
+  bookkeepers:[
+    {id:'BK001',name:'Rosa Mendoza',username:'rosa',password:'bk2024',email:'rosa@fsvelasco.com',contact:'09221234567'},
+    {id:'BK002',name:'Carlo Bautista',username:'carlo',password:'bk2024',email:'carlo@fsvelasco.com',contact:'09231234567'},
+  ],
+  attorneys:[
+    {id:'ATT001',name:'Atty. Clarissa Navarro',email:'clarissa@law.com',contact:'09281234567',bkId:'BK001'},
+    {id:'ATT002',name:'Atty. Juan Reyes',email:'jreyes@law.com',contact:'09291234567',bkId:'BK002'},
+  ],
+  spaces:[
+    {id:'SP001',num:'101',floor:'1st Floor',status:'Occupied',rate:15000,tenantId:'TN001'},
+    {id:'SP002',num:'102',floor:'1st Floor',status:'Occupied',rate:18000,tenantId:'TN002'},
+    {id:'SP003',num:'103',floor:'1st Floor',status:'Available',rate:15000,tenantId:null},
+    {id:'SP004',num:'201',floor:'2nd Floor',status:'Occupied',rate:20000,tenantId:'TN003'},
+    {id:'SP005',num:'202',floor:'2nd Floor',status:'Available',rate:22000,tenantId:null},
+    {id:'SP006',num:'203',floor:'2nd Floor',status:'Under Maintenance',rate:20000,tenantId:null},
+    {id:'SP007',num:'301',floor:'3rd Floor',status:'Occupied',rate:25000,tenantId:'TN004'},
+    {id:'SP008',num:'302',floor:'3rd Floor',status:'Available',rate:25000,tenantId:null},
+  ],
+  tenants:[
+    {id:'TN001',fname:'Juan',lname:'Dela Cruz',email:'juan@email.com',contact:'09171234567',bizName:'JDC Retail Store',bizType:'Retail',moveIn:'2024-01-15',bkId:'BK001'},
+    {id:'TN002',fname:'Maria',lname:'Santos',email:'maria@email.com',contact:'09181234567',bizName:'Santos Tech Shop',bizType:'Technology',moveIn:'2024-03-01',bkId:'BK001'},
+    {id:'TN003',fname:'Pedro',lname:'Reyes',email:'pedro@email.com',contact:'09191234567',bizName:'Reyes Food Court',bizType:'Food & Beverage',moveIn:'2023-11-20',bkId:'BK002'},
+    {id:'TN004',fname:'Jose',lname:'Garcia',email:'jose@email.com',contact:'09231234567',bizName:'Garcia Clothing',bizType:'Apparel',moveIn:'2024-06-01',bkId:'BK001'},
+  ],
+  inquiries:[
+    {id:'IQ001',fname:'Ana',lname:'Lim',email:'ana@email.com',contact:'09221234567',spaceId:'SP003',msg:'Interested in retail space',date:'2026-05-20',status:'New',bkId:'BK001'},
+    {id:'IQ002',fname:'Mark',lname:'Cruz',email:'mark@email.com',contact:'09321234567',spaceId:'SP005',msg:'Looking for office space',date:'2026-05-22',status:'Contacted',bkId:'BK002'},
+    {id:'IQ003',fname:'Lisa',lname:'Tan',email:'lisa@email.com',contact:'09421234567',spaceId:'SP008',msg:'Interested in top floor unit',date:'2026-05-28',status:'New',bkId:'BK001'},
+    {id:'IQ004',fname:'Rico',lname:'Vega',email:'rico@email.com',contact:'09521234567',spaceId:'SP003',msg:'Need commercial space urgently',date:'2026-05-30',status:'New',bkId:'BK002'},
+  ],
+  contracts:[
+    {id:'CON001',start:'2024-01-15',end:'2026-06-15',extYears:0,tenantId:'TN001',spaceId:'SP001'},
+    {id:'CON002',start:'2024-03-01',end:'2026-06-01',extYears:0,tenantId:'TN002',spaceId:'SP002'},
+    {id:'CON003',start:'2023-11-20',end:'2026-07-20',extYears:1,tenantId:'TN003',spaceId:'SP004'},
+    {id:'CON004',start:'2024-06-01',end:'2026-12-01',extYears:0,tenantId:'TN004',spaceId:'SP007'},
+  ],
+  payments:[
+    {id:'PAY001',date:'2026-05-01',status:'Paid',amount:15000,method:'Bank Transfer',contractId:'CON001'},
+    {id:'PAY002',date:'2026-05-01',status:'Paid',amount:18000,method:'GCash',contractId:'CON002'},
+    {id:'PAY003',date:'2026-05-01',status:'Pending',amount:20000,method:'Bank Transfer',contractId:'CON003'},
+    {id:'PAY004',date:'2026-05-01',status:'Paid',amount:25000,method:'Cash',contractId:'CON004'},
+    {id:'PAY005',date:'2026-04-01',status:'Paid',amount:15000,method:'Bank Transfer',contractId:'CON001'},
+    {id:'PAY006',date:'2026-04-01',status:'Paid',amount:18000,method:'GCash',contractId:'CON002'},
+  ]
+};
+
+let currentUser = null;
+
+function gid(id){return document.getElementById(id)}
+function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));gid(v+'-view').classList.add('active')}
+function fmt(n){return '₱'+Number(n).toLocaleString('en-PH')}
+function fmtD(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})}
+function days(d1,d2){return Math.round((new Date(d2)-new Date(d1))/(864e5))}
+function genId(pfx,arr){const ns=arr.map(x=>parseInt(x.id.replace(pfx,''))||0);return pfx+String(Math.max(0,...ns)+1).padStart(3,'0')}
+function sBadge(s){
+  if(s==='Available')return`<span class="a-badge a-badge-green">AVAILABLE</span>`;
+  if(s==='Occupied')return`<span class="a-badge a-badge-blue">OCCUPIED</span>`;
+  if(s==='Under Maintenance')return`<span class="a-badge a-badge-gray">MAINTENANCE</span>`;
+  if(s==='Paid')return`<span class="a-badge a-badge-green">PAID</span>`;
+  if(s==='Pending')return`<span class="a-badge a-badge-gold">PENDING</span>`;
+  if(s==='New')return`<span class="a-badge a-badge-gold">NEW</span>`;
+  if(s==='Contacted')return`<span class="a-badge a-badge-blue">CONTACTED</span>`;
+  if(s==='Converted')return`<span class="a-badge a-badge-green">CONVERTED</span>`;
+  if(s==='Closed')return`<span class="a-badge a-badge-gray">CLOSED</span>`;
+  return`<span class="a-badge a-badge-gray">${s}</span>`;
+}
+function getTenant(id){return DB.tenants.find(t=>t.id===id)}
+function getSpace(id){return DB.spaces.find(s=>s.id===id)}
+function getBK(id){return DB.bookkeepers.find(b=>b.id===id)}
+function getCon(id){return DB.contracts.find(c=>c.id===id)}
+
+function scrollToId(id){gid(id).scrollIntoView({behavior:'smooth'})}
+
+function goLogin(){showView('login');gid('login-err').style.display='none';gid('login-user').value='';gid('login-pass').value=''}
+function goPublic(){showView('pub');renderPublicSpaces()}
+
+function doLogin(){
+  const u=gid('login-user').value.trim();
+  const p=gid('login-pass').value.trim();
+  const bk=DB.bookkeepers.find(b=>b.username===u&&b.password===p);
+  if(bk){
+    currentUser=bk;
+    gid('login-err').style.display='none';
+    showView('admin');
+    renderDash();
+  }else{
+    gid('login-err').style.display='block';
+  }
+}
+
+function doLogout(){currentUser=null;showView('pub');renderPublicSpaces()}
+
+function openInq(spaceId){
+  gid('inq-modal').style.display='flex';
+  gid('inq-form-body').style.display='block';
+  gid('inq-success-body').style.display='none';
+  gid('iq-fname').value='';gid('iq-lname').value='';gid('iq-email').value='';gid('iq-contact').value='';gid('iq-msg').value='';
+  const avail=DB.spaces.filter(s=>s.status==='Available');
+  const sel=gid('iq-space');
+  sel.innerHTML='<option value="">— Select a unit —</option>'+avail.map(s=>`<option value="${s.id}"${spaceId===s.id?' selected':''}>${s.floor} — Unit ${s.num} (${fmt(s.rate)}/mo)</option>`).join('');
+}
+function closeInq(){gid('inq-modal').style.display='none'}
+
+function submitInquiry(){
+  const fn=gid('iq-fname').value.trim();const ln=gid('iq-lname').value.trim();
+  if(!fn||!ln){alert('Please enter your name.');return;}
+  const obj={
+    id:genId('IQ',DB.inquiries),
+    fname:fn,lname:ln,
+    email:gid('iq-email').value,
+    contact:gid('iq-contact').value,
+    spaceId:gid('iq-space').value||null,
+    msg:gid('iq-msg').value,
+    date:TODAY,status:'New',
+    bkId:DB.bookkeepers[Math.floor(Math.random()*DB.bookkeepers.length)].id
+  };
+  DB.inquiries.push(obj);
+  gid('inq-form-body').style.display='none';
+  gid('inq-success-body').style.display='block';
+}
+
+function renderPublicSpaces(){
+  const avail=DB.spaces.filter(s=>s.status==='Available');
+  const grid=gid('pub-spaces-grid');
+  const noSp=gid('pub-no-spaces');
+  if(!avail.length){grid.style.display='none';noSp.style.display='block';return;}
+  grid.style.display='grid';noSp.style.display='none';
+  const descs=['Sophisticated commercial space optimized for growth and luxury retail operations.','Premium enterprise unit with open floor plan and modern finishing throughout.','Corner unit with maximum visibility, ideal for high-foot-traffic businesses.','Versatile commercial space with flexible layout for any business concept.'];
+  grid.innerHTML=avail.map((s,i)=>`
+    <div class="space-card">
+      <div class="space-card-id">UNIT ${s.num}</div>
+      <div class="space-card-rate">${fmt(s.rate)}<span> / mo</span></div>
+      <div class="space-card-floor">${s.floor.toUpperCase()}</div>
+      <div class="space-card-desc">${descs[i%4]}</div>
+      <button class="space-card-btn" onclick="openInq('${s.id}')">SELECT UNIT</button>
+    </div>
+  `).join('');
+}
+
+function aPage(p){
+  document.querySelectorAll('.a-page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.anl').forEach(x=>x.classList.remove('active'));
+  gid('ap-'+p).classList.add('active');
+  const lmap={dash:'Dashboard',inquiries:'Inquiries',spaces:'Spaces',tenants:'Tenants',contracts:'Contracts',finance:'Finance',staff:'Staff',reports:'Reports'};
+  document.querySelectorAll('.anl').forEach(x=>{if(x.textContent.trim()===lmap[p])x.classList.add('active')});
+  if(p==='dash')renderDash();
+  if(p==='inquiries')renderIQ();
+  if(p==='spaces')renderSP();
+  if(p==='tenants')renderTN();
+  if(p==='contracts')renderCON();
+  if(p==='finance')renderPAY();
+  if(p==='staff'){renderBK();renderAtt();}
+  if(p==='reports')gid('report-out').style.display='none';
+}
+
+function openAModal(id){
+  const m=gid(id);m.classList.add('open');
+  if(id==='am-add-contract'){
+    gid('con-start').value=TODAY;
+    gid('con-tenant').innerHTML=DB.tenants.map(t=>`<option value="${t.id}">${t.fname} ${t.lname}</option>`).join('');
+    gid('con-space').innerHTML=DB.spaces.filter(s=>s.status==='Available').map(s=>`<option value="${s.id}">Unit ${s.num} — ${s.floor} (${fmt(s.rate)})</option>`).join('');
+  }
+  if(id==='am-add-payment'){
+    gid('pay-date').value=TODAY;
+    gid('pay-con').innerHTML=DB.contracts.map(c=>{const t=getTenant(c.tenantId);const s=getSpace(c.spaceId);return`<option value="${c.id}">${c.id} — ${t?t.fname+' '+t.lname:'?'} / Unit ${s?s.num:'?'}</option>`}).join('');
+  }
+  if(id==='am-add-tenant')gid('tn-bk').innerHTML=DB.bookkeepers.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  if(id==='am-add-att')gid('att-bk').innerHTML=DB.bookkeepers.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+}
+function closeAModal(id){gid(id).classList.remove('open')}
+
+function renderDash(){
+  gid('ds-inq').textContent=DB.inquiries.filter(i=>i.status==='New').length;
+  gid('ds-ten').textContent=DB.tenants.length;
+  const avail=DB.spaces.filter(s=>s.status==='Available').length;
+  gid('ds-avail').textContent=avail;
+  const thisM=TODAY.slice(0,7);
+  const rev=DB.payments.filter(p=>p.status==='Paid'&&p.date.startsWith(thisM)).reduce((a,p)=>a+p.amount,0);
+  gid('ds-rev').textContent=fmt(rev);
+  const sc={Available:0,Occupied:0,'Under Maintenance':0};
+  DB.spaces.forEach(s=>sc[s.status]++);
+  const cols={Available:'#1a7a4a',Occupied:'#2a4a8a','Under Maintenance':'#8a6a1a'};
+  gid('ds-occ-bars').innerHTML=Object.entries(sc).map(([k,v])=>`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--silver);font-family:sans-serif;letter-spacing:1px">${k.toUpperCase()}</span><span style="font-size:11px;color:var(--gold);font-family:sans-serif">${v} / ${DB.spaces.length}</span></div>
+      <div class="a-progress"><div class="a-progress-fill" style="width:${Math.round(v/DB.spaces.length*100)}%;background:${cols[k]}"></div></div>
+    </div>`).join('');
+  const recentIQ=DB.inquiries.slice(-4).reverse();
+  gid('ds-recent-inq').innerHTML=recentIQ.map(i=>{const s=getSpace(i.spaceId);return`<tr><td>${i.fname} ${i.lname}</td><td>${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(i.date)}</td><td>${sBadge(i.status)}</td></tr>`}).join('');
+  const expCons=DB.contracts.filter(c=>{const d=days(TODAY,c.end);return d>=0&&d<=60}).sort((a,b)=>new Date(a.end)-new Date(b.end));
+  gid('ds-exp-con').innerHTML=expCons.length?expCons.map(c=>{const t=getTenant(c.tenantId);const s=getSpace(c.spaceId);const d=days(TODAY,c.end);return`<tr><td>${t?t.fname+' '+t.lname:'—'}</td><td>${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(c.end)}</td><td><span class="a-badge ${d<=7?'a-badge-red':d<=30?'a-badge-gold':'a-badge-gray'}">${d}d</span></td></tr>`}).join(''):`<tr><td colspan="4" style="text-align:center;color:var(--silver);font-family:sans-serif;font-size:12px;padding:16px">No contracts expiring within 60 days.</td></tr>`;
+}
+
+function renderIQ(){
+  const search=(gid('iq-search').value||'').toLowerCase();
+  const f=gid('iq-filter').value;
+  let list=DB.inquiries.filter(i=>{
+    const m=!search||(i.fname+' '+i.lname).toLowerCase().includes(search)||i.contact.includes(search);
+    return m&&(!f||i.status===f);
+  });
+  gid('iq-count').textContent=list.length;
+  gid('iq-table').innerHTML=list.length?list.map(i=>{
+    const s=getSpace(i.spaceId);const bk=getBK(i.bkId);
+    return`<tr>
+      <td style="font-size:10px;color:var(--gold)">${i.id}</td>
+      <td style="font-weight:500;color:var(--silver2)">${i.fname} ${i.lname}</td>
+      <td style="font-size:11px">${i.contact}</td>
+      <td>${s?'Unit '+s.num+' ('+s.floor+')':'—'}</td>
+      <td style="font-size:11px">${fmtD(i.date)}</td>
+      <td>${sBadge(i.status)}</td>
+      <td style="font-size:11px">${bk?bk.name:'—'}</td>
+      <td style="display:flex;gap:4px">
+        <select style="background:#1b2440;border:1px solid rgba(200,168,76,0.2);color:var(--silver);font-size:10px;padding:3px 6px;cursor:pointer;font-family:sans-serif" onchange="changeIQStatus('${i.id}',this.value)">
+          ${['New','Contacted','Converted','Closed'].map(x=>`<option${x===i.status?' selected':''}>${x}</option>`).join('')}
+        </select>
+        <button class="a-btn a-btn-red a-btn-sm" onclick="delItem('inquiries','${i.id}',renderIQ)"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--silver);font-family:sans-serif;font-size:12px">No inquiries found.</td></tr>`;
+}
+
+function changeIQStatus(id,val){const i=DB.inquiries.find(x=>x.id===id);if(i)i.status=val;renderIQ();}
+
+function renderSP(){
+  const f=gid('sp-filter').value;const ff=gid('sp-floor-f').value;
+  let list=DB.spaces.filter(s=>(!f||s.status===f)&&(!ff||s.floor===ff));
+  gid('sp-count').textContent=list.length;
+  gid('sp-table').innerHTML=list.map(s=>{const t=s.tenantId?getTenant(s.tenantId):null;return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${s.id}</td>
+    <td style="font-weight:500;color:var(--silver2)">Unit ${s.num}</td>
+    <td style="font-size:11px;color:var(--silver)">${s.floor}</td>
+    <td>${sBadge(s.status)}</td>
+    <td style="color:var(--gold)">${fmt(s.rate)}</td>
+    <td style="font-size:11px">${t?t.fname+' '+t.lname:'—'}</td>
+    <td style="display:flex;gap:4px">
+      <button class="a-btn a-btn-outline a-btn-sm" onclick="cycleStatus('${s.id}')"><i class="ti ti-refresh"></i></button>
+      <button class="a-btn a-btn-red a-btn-sm" onclick="delItem('spaces','${s.id}',renderSP)"><i class="ti ti-trash"></i></button>
+    </td>
+  </tr>`}).join('');
+}
+function cycleStatus(id){const s=DB.spaces.find(x=>x.id===id);if(!s)return;const st=['Available','Occupied','Under Maintenance'];s.status=st[(st.indexOf(s.status)+1)%3];if(s.status==='Available')s.tenantId=null;renderSP();renderPublicSpaces();}
+
+function renderTN(){
+  const search=(gid('tn-search').value||'').toLowerCase();
+  let list=DB.tenants.filter(t=>!search||(t.fname+' '+t.lname).toLowerCase().includes(search)||t.bizName.toLowerCase().includes(search));
+  gid('tn-count').textContent=list.length;
+  gid('tn-table').innerHTML=list.map(t=>{const s=DB.spaces.find(sp=>sp.tenantId===t.id);const bk=getBK(t.bkId);return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${t.id}</td>
+    <td style="font-weight:500;color:var(--silver2)">${t.fname} ${t.lname}</td>
+    <td style="font-size:11px">${t.bizName}</td>
+    <td style="font-size:11px">${t.contact}</td>
+    <td style="font-size:11px">${s?'Unit '+s.num:'—'}</td>
+    <td style="font-size:11px">${fmtD(t.moveIn)}</td>
+    <td style="font-size:11px">${bk?bk.name:'—'}</td>
+    <td><button class="a-btn a-btn-red a-btn-sm" onclick="delItem('tenants','${t.id}',renderTN)"><i class="ti ti-trash"></i></button></td>
+  </tr>`}).join('');
+}
+
+function renderCON(){
+  const f=gid('con-filter').value;
+  let list=DB.contracts.filter(c=>{if(!f)return true;const d=days(TODAY,c.end);if(f==='active')return d>=0;if(f==='expiring')return d>=0&&d<=30;if(f==='expired')return d<0;});
+  gid('con-count').textContent=list.length;
+  gid('con-table').innerHTML=list.map(c=>{const t=getTenant(c.tenantId);const s=getSpace(c.spaceId);const d=days(TODAY,c.end);const st=d<0?'Expired':d<=30?'Expiring':'Active';return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${c.id}</td>
+    <td style="font-weight:500;color:var(--silver2)">${t?t.fname+' '+t.lname:'—'}</td>
+    <td style="font-size:11px">${s?'Unit '+s.num+' ('+s.floor+')':'—'}</td>
+    <td style="font-size:11px">${fmtD(c.start)}</td>
+    <td style="font-size:11px">${fmtD(c.end)}</td>
+    <td style="text-align:center">${c.extYears}</td>
+    <td><span class="a-badge ${st==='Active'?'a-badge-green':st==='Expiring'?'a-badge-gold':'a-badge-red'}">${st.toUpperCase()}</span></td>
+    <td style="display:flex;gap:4px">
+      <button class="a-btn a-btn-outline a-btn-sm" onclick="extendCon('${c.id}')" title="Extend 1 year"><i class="ti ti-plus"></i> 1yr</button>
+      <button class="a-btn a-btn-red a-btn-sm" onclick="delItem('contracts','${c.id}',renderCON)"><i class="ti ti-trash"></i></button>
+    </td>
+  </tr>`}).join('');
+}
+function extendCon(id){const c=DB.contracts.find(x=>x.id===id);if(!c)return;const d=new Date(c.end+'T00:00:00');d.setFullYear(d.getFullYear()+1);c.end=d.toISOString().split('T')[0];c.extYears++;renderCON();}
+
+function renderPAY(){
+  const f=gid('pay-filter').value;
+  let list=DB.payments.filter(p=>!f||p.status===f);
+  gid('pay-count').textContent=list.length;
+  const total=DB.payments.filter(p=>p.status==='Paid').reduce((a,p)=>a+p.amount,0);
+  const pend=DB.payments.filter(p=>p.status==='Pending').reduce((a,p)=>a+p.amount,0);
+  const thisM=TODAY.slice(0,7);
+  const month=DB.payments.filter(p=>p.status==='Paid'&&p.date.startsWith(thisM)).reduce((a,p)=>a+p.amount,0);
+  gid('fin-total').textContent=fmt(total);gid('fin-pend').textContent=fmt(pend);gid('fin-month').textContent=fmt(month);
+  gid('pay-table').innerHTML=list.map(p=>{const c=getCon(p.contractId);const t=c?getTenant(c.tenantId):null;return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${p.id}</td>
+    <td style="font-size:11px">${fmtD(p.date)}</td>
+    <td style="font-weight:500;color:var(--silver2)">${t?t.fname+' '+t.lname:'—'}</td>
+    <td style="color:var(--gold)">${fmt(p.amount)}</td>
+    <td style="font-size:11px">${p.method}</td>
+    <td>${sBadge(p.status)}</td>
+    <td style="display:flex;gap:4px">
+      ${p.status==='Pending'?`<button class="a-btn a-btn-gold a-btn-sm" onclick="markPaid('${p.id}')"><i class="ti ti-check"></i> PAID</button>`:''}
+      <button class="a-btn a-btn-red a-btn-sm" onclick="delItem('payments','${p.id}',renderPAY)"><i class="ti ti-trash"></i></button>
+    </td>
+  </tr>`}).join('');
+}
+function markPaid(id){const p=DB.payments.find(x=>x.id===id);if(p)p.status='Paid';renderPAY();}
+
+function renderBK(){
+  gid('bk-table').innerHTML=DB.bookkeepers.map(b=>{const cnt=DB.tenants.filter(t=>t.bkId===b.id).length;return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${b.id}</td>
+    <td style="font-weight:500;color:var(--silver2)">${b.name}</td>
+    <td style="font-size:11px">${b.email}</td>
+    <td><span class="a-badge a-badge-blue">${cnt} tenants</span></td>
+  </tr>`}).join('');
+}
+function renderAtt(){
+  gid('att-table').innerHTML=DB.attorneys.map(a=>{const bk=getBK(a.bkId);return`<tr>
+    <td style="font-size:10px;color:var(--gold)">${a.id}</td>
+    <td style="font-weight:500;color:var(--silver2)">${a.name}</td>
+    <td style="font-size:11px">${a.contact}</td>
+    <td style="font-size:11px">${bk?bk.name:'—'}</td>
+  </tr>`}).join('');
+}
+
+function addSpace(){const n=gid('sp-num').value.trim();if(!n){alert('Enter unit number');return;}DB.spaces.push({id:genId('SP',DB.spaces),num:n,floor:gid('sp-floor').value,status:gid('sp-status').value,rate:parseFloat(gid('sp-rate').value)||0,tenantId:null});closeAModal('am-add-space');renderSP();renderPublicSpaces();}
+function addTenant(){const fn=gid('tn-fname').value.trim();const ln=gid('tn-lname').value.trim();if(!fn||!ln){alert('Enter name');return;}DB.tenants.push({id:genId('TN',DB.tenants),fname:fn,lname:ln,email:gid('tn-email').value,contact:gid('tn-contact').value,bizName:gid('tn-bizname').value,bizType:gid('tn-biztype').value,moveIn:gid('tn-movein').value,bkId:gid('tn-bk').value});closeAModal('am-add-tenant');renderTN();}
+function addContract(){const tId=gid('con-tenant').value;const sId=gid('con-space').value;const st=gid('con-start').value;const en=gid('con-end').value;if(!st||!en){alert('Enter dates');return;}DB.contracts.push({id:genId('CON',DB.contracts),start:st,end:en,extYears:0,tenantId:tId,spaceId:sId});const sp=DB.spaces.find(s=>s.id===sId);if(sp){sp.status='Occupied';sp.tenantId=tId;}closeAModal('am-add-contract');renderCON();renderPublicSpaces();}
+function addPayment(){const cId=gid('pay-con').value;const c=getCon(cId);const s=c?getSpace(c.spaceId):null;DB.payments.push({id:genId('PAY',DB.payments),date:gid('pay-date').value,status:gid('pay-stat').value,amount:parseFloat(gid('pay-amt').value)||(s?s.rate:0),method:gid('pay-meth').value,contractId:cId});closeAModal('am-add-payment');renderPAY();}
+function addBK(){const n=gid('bk-name').value.trim();if(!n){alert('Enter name');return;}DB.bookkeepers.push({id:genId('BK',DB.bookkeepers),name:n,username:gid('bk-user').value,password:gid('bk-pass').value,email:gid('bk-email').value,contact:gid('bk-contact').value});closeAModal('am-add-bk');renderBK();}
+function addAtt(){const n=gid('att-name').value.trim();if(!n){alert('Enter name');return;}DB.attorneys.push({id:genId('ATT',DB.attorneys),name:n,email:gid('att-email').value,contact:gid('att-contact').value,bkId:gid('att-bk').value});closeAModal('am-add-att');renderAtt();}
+
+function delItem(col,id,cb){if(!confirm('Delete this record?'))return;DB[col]=DB[col].filter(x=>x.id!==id);cb();}
+
+function genReport(type){
+  const titles={'tenant-masterlist':'TENANT MASTERLIST','space-availability':'SPACE AVAILABILITY','active-contracts':'ACTIVE CONTRACTS','expiring-contracts':'EXPIRING CONTRACTS','monthly-collection':'MONTHLY COLLECTION','overdue-payments':'OVERDUE PAYMENTS','inquiry-volume':'INQUIRY VOLUME','bookkeeper-performance':'BOOKKEEPER PERFORMANCE','revenue-summary':'REVENUE SUMMARY','contract-history':'CONTRACT HISTORY','space-utilization':'SPACE UTILIZATION','attorney-bookkeeper':'ATTORNEY–BOOKKEEPER ASSIGNMENT'};
+  let html='';
+  if(type==='tenant-masterlist')html=`<table class="a-table"><thead><tr><th>ID</th><th>NAME</th><th>BUSINESS</th><th>TYPE</th><th>CONTACT</th><th>SPACE</th><th>MOVE-IN</th><th>BOOKKEEPER</th></tr></thead><tbody>`+DB.tenants.map(t=>{const s=DB.spaces.find(sp=>sp.tenantId===t.id);const bk=getBK(t.bkId);return`<tr><td style="color:var(--gold);font-size:10px">${t.id}</td><td style="color:var(--silver2);font-weight:500">${t.fname} ${t.lname}</td><td style="font-size:11px">${t.bizName}</td><td style="font-size:11px">${t.bizType}</td><td style="font-size:11px">${t.contact}</td><td style="font-size:11px">${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(t.moveIn)}</td><td style="font-size:11px">${bk?bk.name:'—'}</td></tr>`}).join('')+`</tbody></table>`;
+  else if(type==='space-availability')html=`<table class="a-table"><thead><tr><th>ID</th><th>UNIT</th><th>FLOOR</th><th>STATUS</th><th>RATE</th><th>TENANT</th></tr></thead><tbody>`+DB.spaces.map(s=>{const t=s.tenantId?getTenant(s.tenantId):null;return`<tr><td style="color:var(--gold);font-size:10px">${s.id}</td><td style="color:var(--silver2);font-weight:500">Unit ${s.num}</td><td style="font-size:11px">${s.floor}</td><td>${sBadge(s.status)}</td><td style="color:var(--gold)">${fmt(s.rate)}</td><td style="font-size:11px">${t?t.fname+' '+t.lname:'—'}</td></tr>`}).join('')+`</tbody></table>`;
+  else if(type==='active-contracts')html=`<table class="a-table"><thead><tr><th>ID</th><th>TENANT</th><th>SPACE</th><th>START</th><th>END</th><th>EXT.</th><th>RATE</th></tr></thead><tbody>`+DB.contracts.filter(c=>days(TODAY,c.end)>=0).map(c=>{const t=getTenant(c.tenantId);const s=getSpace(c.spaceId);return`<tr><td style="color:var(--gold);font-size:10px">${c.id}</td><td style="color:var(--silver2);font-weight:500">${t?t.fname+' '+t.lname:'—'}</td><td style="font-size:11px">${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(c.start)}</td><td style="font-size:11px">${fmtD(c.end)}</td><td style="text-align:center">${c.extYears}</td><td style="color:var(--gold)">${s?fmt(s.rate):'—'}</td></tr>`}).join('')+`</tbody></table>`;
+  else if(type==='expiring-contracts'){const exp=DB.contracts.filter(c=>{const d=days(TODAY,c.end);return d>=0&&d<=30});html=(exp.length?`<div class="a-alert a-alert-warn">${exp.length} contract(s) expiring within 30 days.</div>`:'<div class="a-alert a-alert-info">No contracts expiring within 30 days.</div>')+`<table class="a-table"><thead><tr><th>ID</th><th>TENANT</th><th>CONTACT</th><th>SPACE</th><th>END DATE</th><th>DAYS LEFT</th></tr></thead><tbody>`+exp.map(c=>{const t=getTenant(c.tenantId);const s=getSpace(c.spaceId);const d=days(TODAY,c.end);return`<tr><td style="color:var(--gold);font-size:10px">${c.id}</td><td style="color:var(--silver2);font-weight:500">${t?t.fname+' '+t.lname:'—'}</td><td style="font-size:11px">${t?t.contact:'—'}</td><td style="font-size:11px">${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(c.end)}</td><td><span class="a-badge ${d<=7?'a-badge-red':'a-badge-gold'}">${d}d</span></td></tr>`}).join('')+`</tbody></table>`;}
+  else if(type==='monthly-collection'){const bm={};DB.payments.forEach(p=>{const m=p.date.slice(0,7);if(!bm[m])bm[m]={paid:0,pend:0,cnt:0};bm[m].cnt++;if(p.status==='Paid')bm[m].paid+=p.amount;else bm[m].pend+=p.amount;});html=`<table class="a-table"><thead><tr><th>MONTH</th><th>COUNT</th><th>COLLECTED</th><th>PENDING</th></tr></thead><tbody>`+Object.entries(bm).sort((a,b)=>b[0].localeCompare(a[0])).map(([m,v])=>`<tr><td style="color:var(--silver2)">${m}</td><td>${v.cnt}</td><td style="color:var(--gold)">${fmt(v.paid)}</td><td style="color:#e88080">${fmt(v.pend)}</td></tr>`).join('')+`</tbody></table>`;}
+  else if(type==='overdue-payments'){const pend=DB.payments.filter(p=>p.status==='Pending');html=(pend.length?`<div class="a-alert a-alert-warn">${pend.length} pending payment(s) require follow-up.</div>`:'')+`<table class="a-table"><thead><tr><th>ID</th><th>DATE</th><th>TENANT</th><th>CONTACT</th><th>AMOUNT</th></tr></thead><tbody>`+pend.map(p=>{const c=getCon(p.contractId);const t=c?getTenant(c.tenantId):null;return`<tr><td style="color:var(--gold);font-size:10px">${p.id}</td><td style="font-size:11px">${fmtD(p.date)}</td><td style="color:var(--silver2);font-weight:500">${t?t.fname+' '+t.lname:'—'}</td><td style="font-size:11px">${t?t.contact:'—'}</td><td style="color:#e88080;font-weight:500">${fmt(p.amount)}</td></tr>`}).join('')+`</tbody></table>`;}
+  else if(type==='inquiry-volume'){const bs={};DB.inquiries.forEach(i=>bs[i.spaceId]=(bs[i.spaceId]||0)+1);html=`<table class="a-table"><thead><tr><th>SPACE</th><th>FLOOR</th><th>RATE</th><th>INQUIRIES</th></tr></thead><tbody>`+DB.spaces.map(s=>({...s,cnt:bs[s.id]||0})).sort((a,b)=>b.cnt-a.cnt).map(s=>`<tr><td style="color:var(--silver2);font-weight:500">Unit ${s.num}</td><td style="font-size:11px">${s.floor}</td><td style="color:var(--gold)">${fmt(s.rate)}</td><td><span class="a-badge a-badge-blue">${s.cnt}</span></td></tr>`).join('')+`</tbody></table>`;}
+  else if(type==='bookkeeper-performance')html=`<table class="a-table"><thead><tr><th>ID</th><th>BOOKKEEPER</th><th>TENANTS</th><th>INQUIRIES HANDLED</th></tr></thead><tbody>`+DB.bookkeepers.map(b=>{const tnts=DB.tenants.filter(t=>t.bkId===b.id).length;const iqs=DB.inquiries.filter(i=>i.bkId===b.id).length;return`<tr><td style="color:var(--gold);font-size:10px">${b.id}</td><td style="color:var(--silver2);font-weight:500">${b.name}</td><td><span class="a-badge a-badge-green">${tnts}</span></td><td><span class="a-badge a-badge-blue">${iqs}</span></td></tr>`}).join('')+`</tbody></table>`;
+  else if(type==='revenue-summary'){const total=DB.payments.filter(p=>p.status==='Paid').reduce((a,p)=>a+p.amount,0);const pend=DB.payments.filter(p=>p.status==='Pending').reduce((a,p)=>a+p.amount,0);html=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px;border-bottom:1px solid rgba(200,168,76,0.1)"><div class="a-stat"><div class="a-stat-label">TOTAL COLLECTED</div><div class="a-stat-val gold">${fmt(total)}</div></div><div class="a-stat"><div class="a-stat-label">OUTSTANDING</div><div class="a-stat-val" style="color:#e88080">${fmt(pend)}</div></div></div><table class="a-table"><thead><tr><th>TENANT</th><th>BUSINESS</th><th>PAID</th><th>PENDING</th></tr></thead><tbody>`+DB.tenants.map(t=>{const cons=DB.contracts.filter(c=>c.tenantId===t.id);const pays=DB.payments.filter(p=>cons.find(c=>c.id===p.contractId));const paid=pays.filter(p=>p.status==='Paid').reduce((a,p)=>a+p.amount,0);const pe=pays.filter(p=>p.status==='Pending').reduce((a,p)=>a+p.amount,0);return`<tr><td style="color:var(--silver2);font-weight:500">${t.fname} ${t.lname}</td><td style="font-size:11px">${t.bizName}</td><td style="color:var(--gold)">${fmt(paid)}</td><td style="color:${pe?'#e88080':'var(--silver)'}">${fmt(pe)}</td></tr>`}).join('')+`</tbody></table>`;}
+  else if(type==='contract-history')html=DB.tenants.map(t=>{const cons=DB.contracts.filter(c=>c.tenantId===t.id).sort((a,b)=>new Date(a.start)-new Date(b.start));return`<div style="padding:12px 16px;border-bottom:1px solid rgba(200,168,76,0.08)"><div style="font-size:11px;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;font-family:sans-serif">${t.fname.toUpperCase()} ${t.lname.toUpperCase()} — ${t.bizName}</div><table class="a-table"><thead><tr><th>CONTRACT</th><th>SPACE</th><th>START</th><th>END</th><th>EXT.</th><th>STATUS</th></tr></thead><tbody>`+cons.map(c=>{const s=getSpace(c.spaceId);const d=days(TODAY,c.end);const st=d<0?'Expired':d<=30?'Expiring':'Active';return`<tr><td style="color:var(--gold);font-size:10px">${c.id}</td><td style="font-size:11px">${s?'Unit '+s.num:'—'}</td><td style="font-size:11px">${fmtD(c.start)}</td><td style="font-size:11px">${fmtD(c.end)}</td><td style="text-align:center">${c.extYears}</td><td><span class="a-badge ${st==='Active'?'a-badge-green':st==='Expiring'?'a-badge-gold':'a-badge-red'}">${st.toUpperCase()}</span></td></tr>`}).join('')+`</tbody></table></div>`}).join('');
+  else if(type==='space-utilization'){const floors=[...new Set(DB.spaces.map(s=>s.floor))].sort();html=`<table class="a-table"><thead><tr><th>FLOOR</th><th>TOTAL</th><th>OCCUPIED</th><th>AVAILABLE</th><th>MAINTENANCE</th><th>OCCUPANCY RATE</th></tr></thead><tbody>`+floors.map(f=>{const sp=DB.spaces.filter(s=>s.floor===f);const occ=sp.filter(s=>s.status==='Occupied').length;const av=sp.filter(s=>s.status==='Available').length;const ma=sp.filter(s=>s.status==='Under Maintenance').length;const r=Math.round(occ/sp.length*100);return`<tr><td style="color:var(--silver2);font-weight:500">${f}</td><td>${sp.length}</td><td><span class="a-badge a-badge-blue">${occ}</span></td><td><span class="a-badge a-badge-green">${av}</span></td><td><span class="a-badge a-badge-gray">${ma}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div class="a-progress" style="width:80px;flex-shrink:0"><div class="a-progress-fill" style="width:${r}%"></div></div><span style="font-size:11px;color:var(--gold)">${r}%</span></div></td></tr>`}).join('')+`</tbody></table>`;}
+  else if(type==='attorney-bookkeeper')html=`<table class="a-table"><thead><tr><th>ID</th><th>ATTORNEY</th><th>EMAIL</th><th>CONTACT</th><th>BOOKKEEPER</th></tr></thead><tbody>`+DB.attorneys.map(a=>{const bk=getBK(a.bkId);return`<tr><td style="color:var(--gold);font-size:10px">${a.id}</td><td style="color:var(--silver2);font-weight:500">${a.name}</td><td style="font-size:11px">${a.email}</td><td style="font-size:11px">${a.contact}</td><td style="font-size:11px">${bk?bk.name:'—'}</td></tr>`}).join('')+`</tbody></table>`;
+
+  gid('report-out').style.display='block';
+  gid('report-out-title').innerHTML=`<span class="a-card-title">${titles[type]}</span><span style="font-size:10px;color:var(--silver);font-family:sans-serif;letter-spacing:1px">Generated ${new Date().toLocaleString('en-PH')}</span>`;
+  gid('report-out-body').innerHTML=html;
+}
+
+renderPublicSpaces();
+</script>
