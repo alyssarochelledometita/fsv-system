@@ -1,10 +1,10 @@
 {
-  "/api/auth": "pages/api/auth.js",
-  "/_error": "pages/_error.js",
-  "/api/inquiries": "pages/api/inquiries.js",
-  "/api/login": "pages/api/login.js",
   "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/api/auth": "pages/api/auth.js",
+  "/api/inquiries": "pages/api/inquiries.js",
   "/api/spaces": "pages/api/spaces.js",
+  "/api/login": "pages/api/login.js",
   "/": "pages/index.js",
   "/_document": "pages/_document.js",
   "/dashboard": "pages/dashboard.js"
