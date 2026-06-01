@@ -1,39 +1,50 @@
-import { query } from '../../../lib/db'
-import { getSession } from '../../../lib/session'
+import { query } from '../utils/db'; // Double check this path points to your db helper
+import { getSession } from '../utils/session'; // Double check this path points to your session helper
 
 export default async function handler(req, res) {
-  const session = await getSession(req, res)
-
-  // GET /api/auth → check session
-  if (req.method === 'GET') {
-    if (session?.bookkeeper) {
-      return res.json({ bookkeeper: session.bookkeeper })
-    }
-    return res.status(401).json({ error: 'Not authenticated' })
+  // 1. Handle Logouts (DELETE request)
+  if (req.method === 'DELETE') {
+    const session = await getSession(req, res);
+    session.destroy();
+    return res.status(200).json({ success: true });
   }
 
-  // POST /api/auth → login
+  // 2. Handle Logins (POST request)
   if (req.method === 'POST') {
-    const { action, username, password } = req.body
+    const { email, password } = req.body;
 
-    if (action === 'login') {
-      const rows = await query(
-        'SELECT id, name, username, email, contact FROM bookkeepers WHERE username=$1 AND password=$2',
-        [username, password]
-      )
-      if (!rows.length) {
-        return res.status(401).json({ error: 'Invalid credentials' })
+    try {
+      // Queries the bookkeepers table you created in your schema
+      const sql = `
+        SELECT id, first_name, last_name, email 
+        FROM bookkeepers 
+        WHERE email = $1 AND password = $2
+      `;
+      
+      const rows = await query(sql, [email, password]);
+
+      if (rows.length > 0) {
+        const user = rows[0];
+        const session = await getSession(req, res);
+        
+        // Save user into the encrypted iron-session cookie
+        session.bookkeeper = {
+          id: user.id,
+          name: `${user.first_name} ${user.last_name}`,
+          email: user.email
+        };
+        
+        await session.save();
+
+        return res.status(200).json({ success: true });
+      } else {
+        return res.status(401).json({ error: 'Invalid email or password.' });
       }
-      session.bookkeeper = rows[0]
-      await session.save()
-      return res.json({ bookkeeper: rows[0] })
-    }
-
-    if (action === 'logout') {
-      session.destroy()
-      return res.json({ ok: true })
+    } catch (error) {
+      console.error('Database Authentication Error:', error);
+      return res.status(500).json({ error: 'Internal server database error.' });
     }
   }
 
-  res.status(405).end()
+  return res.status(405).json({ error: 'Method not allowed' });
 }

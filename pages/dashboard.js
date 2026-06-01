@@ -1,9 +1,12 @@
 import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session'; // Adjust path to match your project structure
+import { query } from '../../utils/db';       // Adjust path to match your project structure
 
-export default function Dashboard() {
+export default function Dashboard({ user, stats }) {
   const router = useRouter();
 
   const handleLogout = async () => {
+    // Hits your auth route to destroy the cookie session
     const res = await fetch('/api/auth', { method: 'DELETE' });
     if (res.ok) {
       router.push('/');
@@ -26,17 +29,69 @@ export default function Dashboard() {
         <button onClick={handleLogout} style={styles.logoutButton}>Sign Out</button>
       </div>
       <div style={styles.main}>
-        <h1 style={styles.title}>Welcome Back, Admin</h1>
+        {/* Uses the logged-in user name sent from the server session */}
+        <h1 style={styles.title}>Welcome Back, {user?.name || 'Admin'}</h1>
         <p style={styles.subtitle}>Here is the current overview for your building operations.</p>
         
         <div style={styles.grid}>
-          <div style={styles.card}><h3>Total Spaces</h3><p style={styles.statNumber}>--</p></div>
-          <div style={styles.card}><h3>Active Tenants</h3><p style={styles.statNumber}>--</p></div>
-          <div style={styles.card}><h3>Pending Inquiries</h3><p style={styles.statNumber}>--</p></div>
+          {/* Real data counts are cleanly printed here now! */}
+          <div style={styles.card}>
+            <h3>Total Spaces</h3>
+            <p style={styles.statNumber}>{stats.totalSpaces}</p>
+          </div>
+          <div style={styles.card}>
+            <h3>Active Tenants</h3>
+            <p style={styles.statNumber}>{stats.activeTenants}</p>
+          </div>
+          <div style={styles.card}>
+            <h3>Pending Inquiries</h3>
+            <p style={styles.statNumber}>{stats.pendingInquiries}</p>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+// THIS SECURES THE PAGE AND GRABS SUPABASE DATA BEFORE RENDERING
+export async function getServerSideProps({ req, res }) {
+  const session = await getSession(req, res);
+
+  // Guard Rail: If the cookie is dead or user isn't logged in, instantly bounce back to login
+  if (!session?.bookkeeper) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  try {
+    // Gather statistics from your Supabase tables simultaneously
+    const spacesResult = await query("SELECT COUNT(*) FROM spaces");
+    const tenantsResult = await query("SELECT COUNT(*) FROM tenants WHERE status = 'active'");
+    const inquiriesResult = await query("SELECT COUNT(*) FROM inquiries WHERE status = 'pending'");
+
+    return {
+      props: {
+        user: session.bookkeeper,
+        stats: {
+          totalSpaces: spacesResult[0]?.count || 0,
+          activeTenants: tenantsResult[0]?.count || 0,
+          pendingInquiries: inquiriesResult[0]?.count || 0
+        }
+      }
+    };
+  } catch (err) {
+    console.error("Dashboard data extraction error: ", err);
+    return {
+      props: {
+        user: session.bookkeeper,
+        stats: { totalSpaces: 0, activeTenants: 0, pendingInquiries: 0 }
+      }
+    };
+  }
 }
 
 const styles = {
