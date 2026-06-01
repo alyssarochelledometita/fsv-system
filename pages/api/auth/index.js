@@ -1,5 +1,6 @@
-import { query } from '../utils/db'; // Double check this path points to your db helper
-import { getSession } from '../utils/session'; // Double check this path points to your session helper
+// Change from '../utils/...' to '../../../utils/...'
+import { query } from '../../../utils/db'; 
+import { getSession } from '../../../utils/session';
 
 export default async function handler(req, res) {
   // 1. Handle Logouts (DELETE request)

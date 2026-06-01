@@ -1,5 +1,6 @@
-import { query } from '../../utils/db'; // Make sure this path points to your db file
-import { getSession } from '../../utils/session'; // Make sure this path points to your iron-session file
+// Change from '../../utils/...' to '../utils/...'
+import { query } from '../utils/db'; 
+import { getSession } from '../utils/session';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

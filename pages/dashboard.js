@@ -1,3 +1,7 @@
+// Change from '../../utils/...' to '../utils/...'
+import { getSession } from '../utils/session'; 
+import { query } from '../utils/db';
+
 import { useRouter } from 'next/router';
 import { getSession } from '../../utils/session'; // Adjust path to match your project structure
 import { query } from '../../utils/db';       // Adjust path to match your project structure
