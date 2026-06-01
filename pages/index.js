@@ -11,18 +11,21 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
-    const res = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/auth/index', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (res.ok) {
-      // Login successful! Redirect to the admin dashboard
-      router.push('/dashboard');
-    } else {
-      const data = await res.json();
-      setError(data.error || 'Invalid login credentials');
+      if (res.ok) {
+        router.push('/dashboard');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Invalid login credentials');
+      }
+    } catch (err) {
+      setError('Cannot connect to server right now.');
     }
   };
 
@@ -75,6 +78,6 @@ const styles = {
   inputGroup: { marginBottom: '20px' },
   label: { display: 'block', marginBottom: '5px', color: '#134074', fontSize: '14px', fontWeight: '600' },
   input: { width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box', fontSize: '16px' },
-  button: { width: '100%', padding: '12px', backgroundColor: '#0B2545', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s', marginTop: '10px' },
+  button: { width: '100%', padding: '12px', backgroundColor: '#0B2545', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' },
   error: { backgroundColor: '#ffebe9', color: '#ea4a3a', padding: '10px', borderRadius: '4px', marginBottom: '20px', fontSize: '14px', border: '1px solid #ffceca' }
 };
