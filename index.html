@@ -683,17 +683,31 @@ function scrollToId(id){gid(id).scrollIntoView({behavior:'smooth'})}
 function goLogin(){showView('login');gid('login-err').style.display='none';gid('login-user').value='';gid('login-pass').value=''}
 function goPublic(){showView('pub');renderPublicSpaces()}
 
-function doLogin(){
-  const u=gid('login-user').value.trim();
-  const p=gid('login-pass').value.trim();
-  const bk=DB.bookkeepers.find(b=>b.username===u&&b.password===p);
-  if(bk){
-    currentUser=bk;
-    gid('login-err').style.display='none';
-    showView('admin');
-    renderDash();
-  }else{
-    gid('login-err').style.display='block';
+async function doLogin(){
+  const u = gid('login-user').value.trim();
+  const p = gid('login-pass').value.trim();
+  
+  gid('login-err').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      currentUser = data.user;
+      showView('admin');
+      renderDash();
+    } else {
+      gid('login-err').style.display = 'block';
+    }
+  } catch (error) {
+    console.error("Connection failed", error);
+    gid('login-err').style.display = 'block';
   }
 }
 
