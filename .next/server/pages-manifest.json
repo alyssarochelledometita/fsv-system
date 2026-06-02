@@ -1,10 +1,6 @@
 {
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
-  "/api/spaces": "pages/api/spaces.js",
-  "/api/inquiries": "pages/api/inquiries.js",
-  "/": "pages/index.js",
-  "/api/auth": "pages/api/auth.js",
-  "/dashboard": "pages/dashboard.js",
-  "/_document": "pages/_document.js"
+  "/_document": "pages/_document.js",
+  "/": "pages/index.js"
 }

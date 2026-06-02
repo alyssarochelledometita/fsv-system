@@ -1,50 +1,73 @@
-// Change from '../utils/...' to '../../../utils/...'
-import { query } from '../../../utils/db'; 
-import { getSession } from '../../../utils/session';
+// pages/api/auth/index.js
+// Handles: POST (login) and DELETE (logout)
+
+import { getIronSession } from 'iron-session';
+import { query } from '../../../utils/db';
+
+// Must match SECRET_COOKIE_PASSWORD in your .env.local
+const sessionOptions = {
+  password: process.env.SECRET_COOKIE_PASSWORD,
+  cookieName: 'fsvelasco_session',
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+  },
+};
 
 export default async function handler(req, res) {
-  // 1. Handle Logouts (DELETE request)
-  if (req.method === 'DELETE') {
-    const session = await getSession(req, res);
-    session.destroy();
-    return res.status(200).json({ success: true });
+  const session = await getIronSession(req, res, sessionOptions);
+
+  // ─── LOGIN ───────────────────────────────────────────────
+  if (req.method === 'POST') {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    // Change this specific block in your file:
+try {
+  // We specify the columns explicitly to ensure they match exactly
+  // Change your query to this:
+const queryText = `
+  SELECT id, first_name, last_name, email 
+  FROM bookkeepers 
+  WHERE email = $1 AND password = $2
+`;
+  const rows = await query(queryText, [username, password]);
+
+  if (!rows || rows.length === 0) {
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+  // ... rest of the code
+
+      if (rows.length === 0) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+      }
+
+      const bookkeeper = rows[0];
+
+      // Save to session cookie
+      // Update your session save logic:
+        session.bookkeeper = {
+        id: bookkeeper.id,
+        name: `${bookkeeper.first_name} ${bookkeeper.last_name}`,
+        email: bookkeeper.email,
+      };
+      await session.save();
+
+      return res.status(200).json({ ok: true, user: session.bookkeeper });
+
+    } catch (err) {
+      console.error('Login DB error:', err.message);
+      return res.status(500).json({ error: 'Database error. Check your DATABASE_URL.' });
+    }
   }
 
-  // 2. Handle Logins (POST request)
-  if (req.method === 'POST') {
-    const { email, password } = req.body;
-
-    try {
-      // Queries the bookkeepers table you created in your schema
-      const sql = `
-        SELECT id, first_name, last_name, email 
-        FROM bookkeepers 
-        WHERE email = $1 AND password = $2
-      `;
-      
-      const rows = await query(sql, [email, password]);
-
-      if (rows.length > 0) {
-        const user = rows[0];
-        const session = await getSession(req, res);
-        
-        // Save user into the encrypted iron-session cookie
-        session.bookkeeper = {
-          id: user.id,
-          name: `${user.first_name} ${user.last_name}`,
-          email: user.email
-        };
-        
-        await session.save();
-
-        return res.status(200).json({ success: true });
-      } else {
-        return res.status(401).json({ error: 'Invalid email or password.' });
-      }
-    } catch (error) {
-      console.error('Database Authentication Error:', error);
-      return res.status(500).json({ error: 'Internal server database error.' });
-    }
+  // ─── LOGOUT ──────────────────────────────────────────────
+  if (req.method === 'DELETE') {
+    await session.destroy();
+    return res.status(200).json({ ok: true });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
